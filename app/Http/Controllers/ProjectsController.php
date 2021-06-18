@@ -19,21 +19,20 @@ class ProjectsController extends Controller
         if(auth()->id()!= $project->owner_id){
             abort(403);
         }
-        
-        return view('projects.show',compact('project'));
+        return view('projects.showi',compact('project'));
 
     }
     public function store()
     {
         //validate
         // $attributes['owner_id'] = auth()->id();
-        auth()->user()->projects()->create(request()->validate([
+        $project=auth()->user()->projects()->create(request()->validate([
             'title' => 'required',
             'description' => 'required',
         ]));
         //persist
         //redirect
-        return redirect('/projects');
+        return redirect($project->path());
     }
     public function create()
     {
