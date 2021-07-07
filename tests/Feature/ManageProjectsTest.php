@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Project;
 use App\Models\User;
+use Facades\Tests\Setup\ProjectFactory;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -51,34 +52,69 @@ class ManageProjectsTest extends TestCase
 
         $attributes = [
             'title' => $this->faker->sentence,
-            'description' => $this->faker->paragraph
+            'description' => $this->faker->sentence,
+            'notes' => 'General notes here.'
         ];
 
-        $this->post('/projects',$attributes)->assertRedirect('/projects');
+        $response =  $this->post('/projects',$attributes);
+
+        $project = Project::where($attributes)->first();
+
+        $response->assertRedirect($project->path());
 
         $this->assertDatabaseHas('projects',$attributes);
 
-        $this->get('/projects')->assertSee($attributes['title']);
+        $this->get($project->path())
+            ->assertSee($attributes['title'])
+            ->assertSee($attributes['description'])
+            ->assertSee($attributes['notes']);
+
+    }
+    /** @test */
+    public function a_user_can_update_a_project()
+    {
+//        $this->singIn();
+//        $this->withoutExceptionHandling();
+//        $project = Project::factory()->create(['owner_id'=> auth()->id()]);
+
+        $project= ProjectFactory::create();
+
+        $this->actingAs($project->owner)
+            ->patch($project->path(),$attributes =['notes'=> 'Changed'])
+            ->assertRedirect($project->path());
+
+        $this->assertDatabaseHas('projects',$attributes);
     }
 
      /** @test */
      public function a_user_can_view_their_project()
      {
-        $this->singIn();
-        $this->withoutExceptionHandling();
-        $project = Project::factory()->create(['owner_id'=> auth()->id()]);
-        $this->get($project->path())
+//        $this->singIn();
+//        $this->withoutExceptionHandling();
+//        $project = Project::factory()->create(['owner_id'=> auth()->id()]);
+         $project= ProjectFactory::create();
+
+         $this->actingAs($project->owner)
+             ->get($project->path())
             ->assertSee($project->title)
-            ->assertSee($project->description);
+            ->assertSee(str_limit($project->description,150));
      }
-     /** @test */
-     public function a_user_cannnot_view_theprojects_of_others()
-     {
+    /** @test */
+    public function an_authenticated_user_cannnot_view_the_projects_of_others()
+    {
         $this->singIn();
         $project = Project::factory()->create();
         $this->get($project->path())
             ->assertStatus(403);
-     }
+    }
+    /** @test */
+    public function an_authenticated_user_cannnot_update_the_projects_of_others()
+    {
+        $this->singIn();
+        $project = Project::factory()->create();
+        $this->patch($project->path())
+             ->assertStatus(403);
+    }
 
     /** @test */
     public function a_project_requires_a_title()
