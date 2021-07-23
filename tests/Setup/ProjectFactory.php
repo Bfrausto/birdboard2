@@ -13,7 +13,7 @@ class ProjectFactory
 
     public function withTasks($count)
     {
-        $this->tasksCount = $count+56;
+        $this->tasksCount = $count;
 
         return $this;
     }

@@ -26,6 +26,7 @@ class ManageProjectsTest extends TestCase
 
         $this->get('/projects')->assertRedirect('login');
         $this->get('/projects/create')->assertRedirect('login');
+        $this->get($project->path().'/edit')->assertRedirect('login');
         $this->get($project->path())->assertRedirect('login');
         $this->post('/projects', $project->toArray())->assertRedirect('login');
     }
@@ -40,7 +41,7 @@ class ManageProjectsTest extends TestCase
     //     $project = Project::factory()->create();
     //     $this->get($project->path())->assertRedirect('login');
     // }
-
+    
     /** @test */
     public function a_user_can_create_a_project()
     {
@@ -80,12 +81,26 @@ class ManageProjectsTest extends TestCase
         $project= ProjectFactory::create();
 
         $this->actingAs($project->owner)
-            ->patch($project->path(),$attributes =['notes'=> 'Changed'])
+            ->patch($project->path(),$attributes =['title'=>'change','description'=>'Changed','notes'=> 'Changed'])
             ->assertRedirect($project->path());
+
+        $this->get($project->path().'/edit')->assertOk();
 
         $this->assertDatabaseHas('projects',$attributes);
     }
 
+     /** @test */
+     public function a_user_can_update_a_projects_general_notes()
+     {
+        $project= ProjectFactory::create();
+
+        $this->actingAs($project->owner)
+            ->patch($project->path(),$attributes =['notes'=> 'Changed']);
+
+
+        $this->assertDatabaseHas('projects',$attributes);
+
+     }
      /** @test */
      public function a_user_can_view_their_project()
      {

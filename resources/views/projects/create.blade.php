@@ -1,6 +1,18 @@
 @extends('layouts.app')
 @section('content')
-	<form method="POST" action="{{ url('/projects')}}"class="container" style="padding-top: 40px">
+    <div class="lg:w-1/2 lg:mx-auto bg-white py-12 px-16 rounded shadow">
+        <h1 class="text-2xl font-normal mb-10 text-center">Let's start something new</h1>
+
+        <form method="POST"
+                action="/projects"
+                >
+            @include('projects.form',[
+                'project'=> new App\Models\Project,
+                'buttonText'=> 'Create Project'
+                ])
+        </form>
+    </div>
+	{{-- <form method="POST" action="{{ url('/projects')}}"class="container" style="padding-top: 40px">
 		@csrf
 
 		<h1 class="heading">Create a Project</h1>
@@ -27,6 +39,6 @@
                 <a href="/projects">cancel</a>
 			</div>
 		</div>
-	</form>
+	</form> --}}
 
 @endsection
