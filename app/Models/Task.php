@@ -15,7 +15,7 @@ class Task extends Model
     protected $casts = [
         'completed' => 'boolean'
     ];
-
+    protected static $recordableEvents = ['created','deleted'];
 
     public function project()
     {
@@ -42,6 +42,6 @@ class Task extends Model
 
     }
 
-   
+
 
 }

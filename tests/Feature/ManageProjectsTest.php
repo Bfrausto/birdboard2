@@ -41,7 +41,7 @@ class ManageProjectsTest extends TestCase
     //     $project = Project::factory()->create();
     //     $this->get($project->path())->assertRedirect('login');
     // }
-    
+
     /** @test */
     public function a_user_can_create_a_project()
     {
@@ -72,6 +72,39 @@ class ManageProjectsTest extends TestCase
 
     }
     /** @test */
+    public function a_user_can_see_all_projects_they_have_benn_invited_to_on_their_dashboard()
+    {
+        $project = tap(ProjectFactory::create())->invite($this->singIn());
+
+        $this->get('/projects')->assertSee($project->title);
+
+    }
+    /** @test */
+    public function a_user_can_delete_a_project()
+    {
+        $project= ProjectFactory::create();
+
+        $this->actingAs($project->owner)
+            ->delete($project->path())
+            ->assertRedirect('/projects');
+
+        $this->assertDatabaseMissing('projects',$project->only('id'));
+    }
+     /** @test */
+     public function unauthorized_users_cannot_delete_a_project()
+     {
+         $project= ProjectFactory::create();
+
+         $this->delete($project->path())
+             ->assertRedirect('/login');
+
+        $this->singIn();
+        $this->delete($project->path())
+        ->assertStatus(403);
+
+
+     }
+    /** @test */
     public function a_user_can_update_a_project()
     {
 //        $this->singIn();
@@ -88,6 +121,7 @@ class ManageProjectsTest extends TestCase
 
         $this->assertDatabaseHas('projects',$attributes);
     }
+
 
      /** @test */
      public function a_user_can_update_a_projects_general_notes()
