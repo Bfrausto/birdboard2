@@ -40,6 +40,19 @@
     @apply .bg-card .rounded-lg .p-5 .shadow;
     color:var(--text-default-color);
 }
+.dropdown-toggle{
+    > button:focus{
+        outline:o;
+    }
+}
+
+.dropdown-menu-link{
+    @apply .block .text-default .no-underline  .text-sm .leading-loose .px-4;
+
+    &:hover{
+        background:rgba(0,0,0,0.3);
+    }
+}
 
 .theme-light{
     --page-background-color:#f5f6f9;

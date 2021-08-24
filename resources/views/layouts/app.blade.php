@@ -63,21 +63,25 @@
                                 @endif
                             @else
                                 <theme-switcher></theme-switcher>
-                                <a
-                                    class="flex items-center text-default no-underline text-sm"
-                                    href="#" role="button"
-                                    data-toggle="dropdown"
-                                    aria-haspopup="true"
-                                    aria-expanded="false"
-                                    v-pre
-                                >
-                                    <img
-                                        width="35"
-                                        class="rounded-full mr-3"
-                                        src="{{gravatar_url(auth()->user()->email)}}" alt="">
-                                        {{auth()->user()->name}}
-                                </a>
-
+                                <dropdown align="right">
+                                    <template v-slot:trigger>
+                                        <button
+                                            class="flex items-center text-default no-underline text-sm"
+                                        >
+                                            <img
+                                                width="35"
+                                                class="rounded-full mr-3"
+                                                src="{{gravatar_url(auth()->user()->email)}}" alt="">
+                                                {{auth()->user()->name}}
+                                        </button>
+                                    </template>
+                                    <template v-slot:default>
+                                        <form id="logout-form" method="POST" action="{{ route('logout') }}">
+                                            @csrf
+                                            <button type="submit" class="dropdown-menu-link">Logout</button>
+                                        </form>
+                                    </template>
+                                </dropdown>
                             @endguest
                         </div>
                     </div>
