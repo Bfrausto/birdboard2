@@ -30,6 +30,14 @@ class ProjectsController extends Controller
         //validate
         // $attributes['owner_id'] = auth()->id();
         $project=auth()->user()->projects()->create($this->validateRequest());
+
+        if($tasks=request('tasks')){
+            $project->addTasks($tasks);
+        }
+
+        if(request()->wantsJson()){
+            return ['message' => $project->path()];
+        }
         //persist
         //redirect
         return redirect($project->path());
@@ -61,9 +69,10 @@ class ProjectsController extends Controller
     }
     public function destroy(Project $project)
     {
-        $this->authorize('update',$project);
+        $this->authorize('manage',$project);
 
         $project->delete();
+
         return redirect('/projects');
     }
     public function validateRequest()

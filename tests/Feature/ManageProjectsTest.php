@@ -50,26 +50,28 @@ class ManageProjectsTest extends TestCase
         $this->singIn();
 
         $this->get('/projects/create')->assertStatus(200);
+        $this->followingRedirects()
+        ->post('/projects',$attributes = Project::factory()->raw())
+        ->assertSee($attributes['title'])
+        ->assertSee($attributes['description'])
+        ->assertSee($attributes['notes']);
 
-        $attributes = [
-            'title' => $this->faker->sentence,
-            'description' => $this->faker->sentence,
-            'notes' => 'General notes here.'
+    }
+      /** @test */
+    public function tasks_can_be_included_as_part_a_new_project_creation()
+    {
+        $this->singIn();
+
+        $attributes = Project::factory()->raw();
+
+        $attributes['tasks']=[
+            ['body' => 'Task 1'],
+            ['body' => 'Task 2']
         ];
 
-        $response =  $this->post('/projects',$attributes);
+        $this->post('/projects',$attributes);
 
-        $project = Project::where($attributes)->first();
-
-        $response->assertRedirect($project->path());
-
-        $this->assertDatabaseHas('projects',$attributes);
-
-        $this->get($project->path())
-            ->assertSee($attributes['title'])
-            ->assertSee($attributes['description'])
-            ->assertSee($attributes['notes']);
-
+        $this->assertCount(2, Project::first()->tasks);
     }
     /** @test */
     public function a_user_can_see_all_projects_they_have_benn_invited_to_on_their_dashboard()
@@ -98,11 +100,16 @@ class ManageProjectsTest extends TestCase
          $this->delete($project->path())
              ->assertRedirect('/login');
 
-        $this->singIn();
+        $user=$this->singIn();
+
         $this->delete($project->path())
-        ->assertStatus(403);
+            ->assertStatus(403);
+
+        $project->invite($user);
 
 
+        $this->delete($project->path())
+            ->assertStatus(403);
      }
     /** @test */
     public function a_user_can_update_a_project()
@@ -146,7 +153,7 @@ class ManageProjectsTest extends TestCase
          $this->actingAs($project->owner)
              ->get($project->path())
             ->assertSee($project->title)
-            ->assertSee(str_limit($project->description,150));
+            ->assertSee(str_limit($project->description,100));
      }
     /** @test */
     public function an_authenticated_user_cannnot_view_the_projects_of_others()

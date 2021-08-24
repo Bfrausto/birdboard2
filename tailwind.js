@@ -45,6 +45,14 @@ let defaultConfig = require('tailwindcss/defaultConfig')()
 
 let colors = {
   'transparent': 'transparent',
+    default:  'var(--text-default-color)',
+    accent:   'var(--text-accent-color)',
+    'accent-light':'var(--text-accent-light-color)',
+    muted:'var(--text-muted-color)',
+    'muted-light':'var(--text-muted-light-color)',
+    'mu':'var(--text-mu)',
+    'error':'var(--text-error-color)',
+
 
   'black': '#22292f',
   'grey-darkest': '#3d4852',
@@ -364,7 +372,13 @@ module.exports = {
   |
   */
 
-  backgroundColors: colors,
+  backgroundColors:{
+      'page': 'var(--page-background-color)',
+      'button':'var(--button-background-color)',
+      'card':'var(--card-background-color)',
+      'header':'var(--header-background-color)',
+
+  },
 
 
   /*

@@ -2,8 +2,8 @@
 @section('content')
     <header class="flex items-center mb-3 py-4">
         <div class="flex justify-between  items-end w-full">
-            <p  class="text-grey text-sm font-normal">
-               <a href="/projects" class="text-grey text-sm font-normal no-underline">My Projects </a>/ {{$project->title}}
+            <p  class="text-default text-sm font-normal">
+               <a href="/projects" class="text-default text-sm font-normal no-underline">My Projects </a>/ {{$project->title}}
             </p>
             <div class="flex items-center">
                 @foreach ($project->members as $member)
@@ -19,7 +19,7 @@
         <div class="lg:flex -m-3">
             <div class="lg:w-3/4 px-3 mb-6">
                 <div class="mb-8">
-                    <h2  class="text-grey text-lg font-normal mb-3">Tasks</h2>
+                    <h2  class="text-default text-lg font-normal mb-3">Tasks</h2>
                     @foreach ($project->tasks as $task)
 
                         <div class="card mb-3">
@@ -27,7 +27,7 @@
                                 @method('PATCH')
                                 @csrf
                                 <div class="flex">
-                                    <input name='body' value="{{$task->body}}" class="w-full  {{$task->completed ? 'text-grey' : ''}}" >
+                                    <input name='body' value="{{$task->body}}" class="bg-card text-default w-full  {{$task->completed ? 'line-through' : ''}}" >
                                     <input name="completed" type="checkbox" onchange="this.form.submit()" {{$task->completed ? 'checked' : ''}}>
                                 </div>
                             </form>
@@ -36,12 +36,12 @@
                     <div class="card mb-3 ">
                         <form action="{{$project->path().'/tasks'}}" method="POST">
                             @csrf
-                            <input placeholder='Ad a new task...' class="w-full" name="body">
+                            <input placeholder='Ad a new task...' class="bg-card text-default w-full" name="body">
                         </form>
                     </div>
                 </div>
                 <div>
-                    <h2  class="text-grey text-lg font-normal mb-3">General Notes</h2>
+                    <h2  class="text-default text-lg font-normal mb-3">General Notes</h2>
                     <form method="POST" action="{{$project->path()}}">
                         @csrf
                         @method('PATCH')
@@ -53,18 +53,15 @@
                             >{{$project->notes}}</textarea>
                         <button type="submit" class="button">Save</button>
                     </form>
-                    @if ($errors->any())
-                        <div class="field mt-6">
-                                @foreach ($errors->all() as $error)
-                                    <li class="text-sm text-red">{{$error}}</li>
-                                @endforeach
-                        </div>
-                    @endif
+                   @include('projects.errors')
                 </div>
             </div>
             <div class="lg:w-1/4 px-3 lg:py-8">
                 @include('projects.card')
-                @include(('projects.activity.card'))
+                @include('projects.activity.card')
+                @can('manage',$project)
+                    @include('projects.invite')
+                @endcan
             </div>
         </div>
     </main>
